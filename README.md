@@ -49,6 +49,8 @@ The `scripts/` directory contains the core logic for the blog generation process
 
 You must create a `.env` file at the root of the project. This file should contain all required environment variables for the project to function. (The specific variables required depend on the scripts and integrations you use, such as API keys for Google or OpenAI. Please refer to the documentation for each script or integration to determine the exact variables needed.)
 
+A template file named `.env_model` is provided. Update this file with your own API keys and settings, then rename it to `.env` at the root of the project.
+
 ## Script Commands
 
 Below is an explanation of each command in the `package.json` and how to run them. To run any command, use:
