@@ -45,4 +45,48 @@ The `scripts/` directory contains the core logic for the blog generation process
 
 (User: Please add instructions here if you want to specify how to set up and run the project, e.g., environment variables, API keys needed, and common script commands from `package.json` like `npm run daily-blog` or `npm run full-blog-generation`.)
 
+### Environment Setup
+
+You must create a `.env` file at the root of the project. This file should contain all required environment variables for the project to function. (The specific variables required depend on the scripts and integrations you use, such as API keys for Google or OpenAI. Please refer to the documentation for each script or integration to determine the exact variables needed.)
+
+## Script Commands
+
+Below is an explanation of each command in the `package.json` and how to run them. To run any command, use:
+
+```
+npm run <script-name>
+```
+
+Replace `<script-name>` with the name of the script you want to execute.
+
+| Script Name                      | Command/Script                                      | What It Does                                                                                   |
+|----------------------------------|-----------------------------------------------------|------------------------------------------------------------------------------------------------|
+| dev                              | vite                                                | Starts the Vite development server for local development.                                      |
+| build                            | vite build                                          | Builds the project for production using Vite.                                                  |
+| lint                             | eslint .                                            | Runs ESLint to check for code quality and style issues.                                        |
+| preview                          | vite preview                                        | Serves the production build locally for previewing.                                            |
+| generate:blog-images             | tsx scripts/generate-blog-images.ts                 | Runs the script to generate blog images.                                                       |
+| generate:inline-images           | tsx scripts/generate-inline-blog-images.ts          | Runs the script to generate inline images for blog posts.                                      |
+| test:image-generation            | tsx scripts/test-image-generation.ts                | Runs tests for image generation functionality.                                                 |
+| generate:topics                  | tsx scripts/topic-generator.ts                      | Runs the script to generate blog post topics.                                                  |
+| daily-blog                       | tsx scripts/daily-blog-generation.ts                | Automates the creation of blog posts on a daily basis.                                         |
+| full-blog-generation             | bash scripts/generate-full-blogs.sh                 | Runs a shell script to generate complete blog articles.                                        |
+| optimize:existing-blog-images    | node scripts/optimize-existing-blog-images.js       | Optimizes existing blog images.                                                                |
+| optimize-and-generate            | npm run optimize:existing-blog-images && npm run full-blog-generation 1 | Optimizes existing images, then generates full blogs.                                          |
+| optimize-images                  | tsx scripts/optimize-images.js                      | Optimizes image files (likely new or all images).                                              |
+
+**How to run a script:**
+
+For example, to generate blog images:
+
+```
+npm run generate:blog-images
+```
+
+Or to start the development server:
+
+```
+npm run dev
+```
+
 This `README.md` provides a high-level overview of the AI Blog Generation project based on the repository structure and file names. 
