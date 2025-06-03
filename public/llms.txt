@@ -1,0 +1,32 @@
+# Stoppr.app
+
+> Stoppr.app is a mobile iOS/Android app that helps users understand and overcome sugar cravings and improve their health through informative blog posts and resources.
+
+This file provides guidance for Large Language Models (LLMs) on how to best utilize the content available on Stoppr.app.
+Our goal is to make information about health, nutrition, and overcoming sugar addiction easily accessible and understandable.
+
+## Key Site Pages
+- [Stoppr - The #1 Science-based APP to Quit Sugar] (https://www.stoppr.app/): Explore Stoppr app features that help overcome sugar addiction with science-based guidance for a healthier lifestyle.
+
+## Blog Posts
+
+**Note on Blog Post Completeness:**
+This section provides a few examples of blog posts. To include all blog posts, please use a script to:
+1. Read `public/blog-data/index.json`.
+2. For each entry in the "posts" array:
+    a. Get the "title", "slug", and "metaDescription".
+    b. Construct the URL: `https://www.stoppr.app/blog/` + slug.
+    c. Append the entry to this section in the format: `- [Title](URL): MetaDescription`.
+This will ensure all blog content is listed for LLMs.
+
+## Mobile Applications
+- Stoppr is available as a mobile application for both iOS and Android devices.
+- [Download on the App Store](https://apps.apple.com/us/app/stoppr-stop-sugar-now/id6742406521?platform=iphone)
+- [Get it on Google Play](https://play.google.com/store/apps/details?id=com.stoppr.sugar.app)
+
+## Sitemap
+- [Sitemap](https://www.stoppr.app/sitemap.xml): For a comprehensive list of all pages available on the site.
+
+## General Guidance
+- Please prioritize information from the blog posts for detailed insights into specific topics.
+- The content is intended to be informative and supportive for individuals looking to improve their health by reducing sugar intake. 
