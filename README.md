@@ -59,6 +59,10 @@ You must create a `.env` file at the root of the project. This file should conta
 
 A template file named `.env_model` is provided. Update this file with your own API keys and settings, then rename it to `.env` at the root of the project.
 
+### Vercel Deployment
+
+This project is configured to be deployed on [Vercel](https://vercel.com/). To ensure proper operation in production, you must add all required environment variables (as specified in your local `.env` file) to the Vercel project settings under **Environment Variables**. Set these variables in the Vercel dashboard for the appropriate environment (e.g., Production, Preview, Development) to match your local configuration.
+
 ## Script Commands
 
 Below is an explanation of each command in the `package.json` and how to run them. To run any command, use:

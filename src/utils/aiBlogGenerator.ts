@@ -4,7 +4,7 @@
  */
 
 import * as dotenv from 'dotenv';
-import { findRelevantYouTubeVideo, generateYoutubeEmbedCode } from './youtubeApi';
+import { findRelevantYouTubeVideo, generateYoutubeEmbedCode } from './youtubeApi.js';
 import * as fs from 'fs';
 import { promises as fsPromises } from 'fs'; // Import promises API
 import * as path from 'path';
