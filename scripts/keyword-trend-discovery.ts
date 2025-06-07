@@ -24,7 +24,7 @@ const OUTPUT_DIR = path.resolve(process.cwd(), 'scripts/generated');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, `trending-keywords-${new Date().toISOString().split('T')[0]}.json`);
 const KEYWORDS_DIR = path.join(process.cwd(), 'public', 'keywords');
 const NOSUGAR_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'nosugar_keywords.json');
-const LOOKSMAXXING_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'looksmaxxing_keywords.json');
+const LOOKSMAXXING_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'keywords.json');
 
 // Ensure output directory exists
 if (!fs.existsSync(OUTPUT_DIR)) {

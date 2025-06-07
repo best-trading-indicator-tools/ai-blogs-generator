@@ -40,6 +40,8 @@ The `scripts/` directory contains the core logic for the blog generation process
 *   `optimize-images.js`: Optimizes image files.
 *   `rebuild-index.js`: Potentially updates a search index or site map.
 *   `topic-generator.ts`: Generates blog post topics.
+*   `generate-inline-blog-images.ts`: Generates inline images for blog posts by detecting placeholders in blog content and creating images using the Ideogram API.
+*   `optimize-existing-blog-images.js`: Optimizes all existing blog images and updates blog post JSON files to reference the optimized versions.
 
 ## Getting Started
 
@@ -96,5 +98,14 @@ Or to start the development server:
 ```
 npm run dev
 ```
+
+## Utility Modules Overview
+
+The `src/utils/` directory contains utility modules used throughout the project:
+
+*   `aiBlogGenerator.ts`: Generates full blog content using the Anthropic Claude API, manages internal linking, and handles looksmaxxing keyword detection.
+*   `aiTextGenerator.ts`: Generates catchy text overlays for blog images and AI-generated blog titles using the Anthropic Claude API.
+*   `youtubeApi.ts`: Finds relevant YouTube videos for embedding in blog posts using the YouTube Data API.
+*   `ideogramApi.ts`: Interfaces with the Ideogram API to generate and upscale blog images for use in posts.
 
 This `README.md` provides a high-level overview of the AI Blog Generation project based on the repository structure and file names. 

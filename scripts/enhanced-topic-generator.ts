@@ -25,7 +25,7 @@ const DEFAULT_TOPIC_COUNT = 2;
 
 const KEYWORDS_DIR = path.join(process.cwd(), 'public', 'keywords');
 const NOSUGAR_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'nosugar_keywords.json');
-const LOOKSMAXXING_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'looksmaxxing_keywords.json');
+const LOOKSMAXXING_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'keywords.json');
 
 function loadJsonKeywords(filePath: string): string[] {
   try {
