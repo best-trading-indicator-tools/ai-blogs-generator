@@ -43,6 +43,12 @@ The `scripts/` directory contains the core logic for the blog generation process
 
 ## Getting Started
 
+Before running any scripts or starting development, install all required dependencies by running:
+
+```
+npm install
+```
+
 (User: Please add instructions here if you want to specify how to set up and run the project, e.g., environment variables, API keys needed, and common script commands from `package.json` like `npm run daily-blog` or `npm run full-blog-generation`.)
 
 ### Environment Setup
