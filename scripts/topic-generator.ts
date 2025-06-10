@@ -16,7 +16,15 @@ const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
 const KEYWORDS_DIR = path.join(process.cwd(), 'public', 'keywords');
 const NOSUGAR_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'nosugar_keywords.json');
-const LOOKSMAXXING_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'keywords.json');
+
+// --- Define BlogTopic Interface (re-added for linter fix) ---
+interface BlogTopic {
+  title: string;
+  slug: string;
+  category: string;
+  metaDescription: string;
+  tags: string[];
+}
 
 function loadJsonKeywords(filePath: string): string[] {
   try {
@@ -36,25 +44,11 @@ function loadJsonKeywords(filePath: string): string[] {
 
 // Dynamically loaded keyword lists
 const baseKeywords = loadJsonKeywords(NOSUGAR_KEYWORDS_PATH);
-const looksmaxxingKeywords = loadJsonKeywords(LOOKSMAXXING_KEYWORDS_PATH);
 
-if (baseKeywords.length === 0 && looksmaxxingKeywords.length === 0) {
+if (baseKeywords.length === 0) {
   console.error('No keywords loaded from JSON files. Exiting.');
   process.exit(1);
 }
-
-// Update combined list
-const allKeywords = [...baseKeywords, ...looksmaxxingKeywords];
-
-// --- NEW: Define BlogTopic Interface ---
-interface BlogTopic {
-  title: string;
-  slug: string;
-  category: string;
-  metaDescription: string;
-  tags: string[];
-}
-// --- END NEW ---
 
 // Title templates for different content formats
 const nonLooksmaxxingTitleTemplates = [
@@ -70,21 +64,6 @@ const nonLooksmaxxingTitleTemplates = [
   '[keyword] Myths Debunked'
 ];
 
-// --- NEW: Separate Looksmaxxing Templates ---
-const looksmaxxingTitleTemplates = [
-  'Does [Looksmaxxing Technique] Actually Work?',
-  'Beginner\'s Guide to [Looksmaxxing Aspect]',
-  '[number] [adjective] Looksmaxxing Tips',
-  'Real Risks of [Looksmaxxing Trend]',
-  'Looksmaxxing: Beyond [Social Media Platform] Hype',
-  'Ultimate Guide to Looksmaxxing: [Looksmaxxing Aspect]',
-  'How [Looksmaxxing Concept] Can Boost Your Confidence',
-  'Level Up Your Look: Exploring [Looksmaxxing Technique]',
-  '[number] Essential [Looksmaxxing Aspect] Tips for Men', // Example of more specific template
-  'The Science Behind [Looksmaxxing Technique]'
-];
-// --- END NEW ---
-
 // Fill-in options for templates
 const fillInOptions = {
   action: ['reduce', 'eliminate', 'manage', 'overcome', 'control', 'balance', 'fight', 'understand', 'optimize', 'improve', 'enhance'],
@@ -95,14 +74,6 @@ const fillInOptions = {
   alternateKeyword: ['artificial sweeteners', 'natural sugars', 'honey', 'fructose', 'carbs', 'fat', 'quick fixes', 'surgery', 'placebo', 'genetics'],
   healthAspect: ['weight loss', 'energy', 'mental clarity', 'sleep', 'digestion', 'aging', 'immune function', 'self-esteem', 'attractiveness', 'social perception', 'first impressions'],
   negativeOutcome: ['cravings', 'withdrawal symptoms', 'feeling deprived', 'hunger', 'energy crashes', 'unrealistic expectations', 'body dysmorphia', 'wasting money', 'dangerous side effects', 'social isolation'],
-  // Looksmaxxing specific fill-ins
-  'Looksmaxxing Technique': ['mewing', 'cold showers', 'oil pulling', 'specific grooming routines', 'posture correction', 'skincare layering', 'derma rolling', 'facial massage', 'tongue posture'],
-  'Looksmaxxing Aspect': ['skincare', 'haircare', 'fitness', 'style', 'mindset', 'looksmaxxing', 'facial structure', 'grooming habits', 'personal hygiene', 'body composition'],
-  'Looksmaxxing Trend': ['jawline exercises', 'bone smashing', 'heightmaxxing', 'looksmaxxing itself', 'looksmaxxing challenges', 'celebrity looksmaxxing'],
-  'Social Media Platform': ['TikTok', 'Instagram', 'YouTube', 'Reddit', 'looksmaxxing forums'],
-  // --- NEW: Added Looksmaxxing Concept ---
-  'Looksmaxxing Concept': ['Looksmaxxing', 'Glow Up', 'Self-Improvement', 'Aesthetic Enhancement', 'Personal Optimization']
-  // --- END NEW ---
 };
 
 // Category options for blog posts
@@ -115,28 +86,6 @@ const nonLooksmaxxingCategories = [
   'Health Research',
   'Lifestyle' // Can overlap, but primarily non-looksmaxxing context here
 ];
-
-// --- NEW: Separate Looksmaxxing Categories ---
-const looksmaxxingCategories = [
-  'Self-Improvement',
-  "Men's Health", // Fixed quotes for apostrophe
-  'Personal Development',
-  'Looksmaxxing',
-  'Glow Up',
-  'Glow Up Tips',
-  'Glow Up Advice',
-  'Glow Up Routine',
-  'Glow Up Guide',
-  'Debloat',
-  'Debloating',
-  'Looksmaxxing Tips',
-  'Looksmaxxing Advice',
-  'Looksmaxxing Routine',
-  'Looksmaxxing Guide',
-  'Aesthetics',
-  'Style & Fashion'
-];
-// --- END NEW ---
 
 // Generate a slug from a title
 function generateSlug(title: string): string {
@@ -255,22 +204,10 @@ async function generateBlogTopic(): Promise<BlogTopic> {
   let selectedKeywords: string[];
   let selectedTags: string[];
 
-  // --- NEW: 70% Chance for Looksmaxxing Topic ---
-  const isLooksmaxxingTopic = Math.random() < 0.7;
-
-  if (isLooksmaxxingTopic) {
-    console.log("Generating Looksmaxxing topic...");
-    title = fillTemplate(getRandomItem(looksmaxxingTitleTemplates), looksmaxxingKeywords); // Use looksmaxxing templates & keywords
-    category = getRandomItem(looksmaxxingCategories);
-    selectedKeywords = looksmaxxingKeywords; // Use looksmaxxing keywords for tag generation
-    selectedTags = ['looksmaxxing', 'self-improvement']; // Start with core tags
-  } else {
-    console.log("Generating Non-Looksmaxxing topic...");
-    title = fillTemplate(getRandomItem(nonLooksmaxxingTitleTemplates), baseKeywords); // Use non-looksmaxxing templates & keywords
-    category = getRandomItem(nonLooksmaxxingCategories);
-    selectedKeywords = baseKeywords; // Use base keywords for tag generation
-    selectedTags = []; // Start with empty tags
-  }
+  title = fillTemplate(getRandomItem(nonLooksmaxxingTitleTemplates), baseKeywords); // Use non-looksmaxxing templates & keywords
+  category = getRandomItem(nonLooksmaxxingCategories);
+  selectedKeywords = baseKeywords; // Use base keywords for tag generation
+  selectedTags = []; // Start with empty tags
 
   // Generate slug using AI
   const slug = await generateAISlug(title);
@@ -304,14 +241,8 @@ async function generateBlogTopic(): Promise<BlogTopic> {
   }
 
   // Generate a meta description
-  // --- NEW: Tailor meta description slightly based on topic type ---
   let metaDescription: string;
-  if (isLooksmaxxingTopic) {
-    metaDescription = `Explore ${title.toLowerCase()}. Get insights, tips, and analysis on looksmaxxing, self-improvement, and aesthetics.`;
-  } else {
-    metaDescription = `Discover everything about ${title.toLowerCase()}. Learn science-backed strategies, expert tips, and practical advice for your health journey.`;
-  }
-  // --- END NEW ---
+  metaDescription = `Discover everything about ${title.toLowerCase()}. Learn science-backed strategies, expert tips, and practical advice for your health journey.`;
 
   return {
     title,

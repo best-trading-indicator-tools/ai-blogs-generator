@@ -76,9 +76,9 @@ async function processBlogFile(filePath: string): Promise<void> {
     
     console.log(`Found ${allPlaceholders.length} total image placeholders in blog: ${blogData.title}`);
 
-    // Determine random number of images to generate (1 to 3, but no more than found)
+    // Determine random number of images to generate (1 to 2, but no more than found)
     const numPlaceholdersFound = allPlaceholders.length;
-    const numToGenerate = Math.min(numPlaceholdersFound, Math.floor(Math.random() * 3) + 1);
+    const numToGenerate = Math.min(numPlaceholdersFound, Math.floor(Math.random() * 2) + 1);
     console.log(`Randomly selected to generate ${numToGenerate} inline image(s).`);
 
     // Randomly select which placeholders to process

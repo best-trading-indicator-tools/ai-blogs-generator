@@ -25,7 +25,6 @@ const DEFAULT_TOPIC_COUNT = 2;
 
 const KEYWORDS_DIR = path.join(process.cwd(), 'public', 'keywords');
 const NOSUGAR_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'nosugar_keywords.json');
-const LOOKSMAXXING_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'keywords.json');
 
 function loadJsonKeywords(filePath: string): string[] {
   try {
@@ -45,15 +44,14 @@ function loadJsonKeywords(filePath: string): string[] {
 
 // Load keyword lists (no fallback)
 const nosugarKeywords = loadJsonKeywords(NOSUGAR_KEYWORDS_PATH);
-const looksmaxxingKeywordsFile = loadJsonKeywords(LOOKSMAXXING_KEYWORDS_PATH);
 
-if (nosugarKeywords.length === 0 && looksmaxxingKeywordsFile.length === 0) {
+if (nosugarKeywords.length === 0) {
   console.error('No keywords loaded from JSON files. Exiting.');
   process.exit(1);
 }
 
 // Combine both lists, ensuring uniqueness
-const baseKeywords = Array.from(new Set([...nosugarKeywords, ...looksmaxxingKeywordsFile]));
+const baseKeywords = Array.from(new Set([...nosugarKeywords]));
 
 // Category options for blog posts
 const categories = [

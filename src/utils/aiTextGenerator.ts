@@ -28,7 +28,7 @@ export async function generateTextOverlay(
     // Default to hardcoded fallback if API key is not available
     if (!ANTHROPIC_API_KEY) {
       console.warn('Anthropic API key not found, using fallback text generation');
-      return generateFallbackText(blogTitle, blogCategory);
+      return await generateFallbackText(blogTitle, blogCategory);
     }
 
     const prompt = `
@@ -86,7 +86,7 @@ ${prompt}`
   } catch (error) {
     console.error('Failed to generate AI text overlay:', error);
     // Fallback to rule-based generation if API fails
-    return generateFallbackText(blogTitle, blogCategory);
+    return await generateFallbackText(blogTitle, blogCategory);
   }
 }
 
@@ -96,27 +96,40 @@ ${prompt}`
  * @param blogCategory - The category of the blog
  * @returns A rule-based generated text overlay
  */
-function generateFallbackText(blogTitle: string, blogCategory: string): string {
-  // Health and nutrition related catchy phrases
-  const phrases = [
-    "NATURAL SWEETNESS",
-    "SUGAR-FREE LIVING",
-    "SWEET WITHOUT SUGAR",
-    "HEALTHY INDULGENCE",
-    "BEYOND SUGAR",
-    "NATURALLY SWEET",
-    "CRAVINGS CONQUERED",
-    "SWEET SCIENCE",
-    "BETTER CHOICES",
-    "SUGAR FREEDOM"
-  ];
-  
-  // Use deterministic selection combining blog title and category
-  const seedString = blogTitle + blogCategory;
-  const seed = seedString.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const selectedPhrase = phrases[seed % phrases.length];
-  
-  return selectedPhrase;
+async function generateFallbackText(blogTitle: string, blogCategory: string): Promise<string> {
+  try {
+    const response = await fetch('/keywords/keywords.json');
+    if (!response.ok) {
+      // If fetching fails, return a simple fallback.
+      return blogTitle.toUpperCase();
+    }
+    const keywords: string[] = await response.json();
+
+    if (!keywords || keywords.length === 0) {
+      return blogTitle.toUpperCase();
+    }
+
+    // Generate phrases from keywords
+    const stopWords = new Set(['a', 'an', 'the', 'in', 'on', 'for', 'to', 'of', 'and', 'is', 'how', 'guide', 'tips', 'for', 'beginners', 'plan', 'comprehensive', 'start']);
+    const phrases = [...new Set(keywords.map(kw => 
+      kw.toLowerCase()
+        .split(' ')
+        .filter(word => !stopWords.has(word))
+        .slice(0, 3) // Take up to 3 words
+        .join(' ')
+        .toUpperCase()
+    ).filter(p => p.length > 0))];
+    
+    // Use deterministic selection combining blog title and category
+    const seedString = blogTitle + blogCategory;
+    const seed = seedString.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    const selectedPhrase = phrases[seed % phrases.length];
+    
+    return selectedPhrase || blogTitle.toUpperCase();
+  } catch (error) {
+    console.error("Failed to load or process keywords for fallback text:", error);
+    return blogTitle.toUpperCase();
+  }
 }
 
 /**
@@ -145,15 +158,12 @@ export async function generateAITitle(keywords: string[], category: string): Pro
 Please introduce significant variety in the title structures and starting phrases. Use approaches like questions, clear benefit statements (e.g., "How X Helps You Achieve Y" instead of "Unlock Y with X"), "how-to" guides, and unique hooks. Avoid overusing any single structure, starting phrase, or overly "hyped" marketing verbs (e.g., "unlock," "delve," "discover," "harness," "supercharge," "skyrocket"). Focus on clarity and genuine curiosity.
 
 Examples of good titles:
-- Is Sugar Sabotaging Your Weight Loss Goals?
 - Surprising Ways Stress Affects Your Metabolism
 - The Ultimate Guide to Starting a Keto Diet
-- Clear Skin Secrets: How Quitting Sugar Helps Looksmaxxing
-- Boost Your Looksmaxxing Journey: Ditch Sugar Now
-- The No-Sugar Diet for Enhanced Facial Aesthetics
-- Level Up Your Looks: The Sugar-Free Advantage
-- Looksmaxxing & Diet: Why Sugar is the Enemy
-- Get Jawline Definition: Cut Out Sugar
+- Is Poor Sleep Affecting Your Productivity?
+- Beginner's Guide to a Healthier Lifestyle
+- Mastering Your Morning Routine
+- The Science Behind Better Sleep
 
 Generate ONLY the title text, nothing else.`;
 
@@ -234,7 +244,7 @@ export async function generateKeywordSuggestions(
   if (type === 'long-tail') {
     instruction = `Generate ${count} unique long-tail keyword variations for the primary keyword "${primaryKeyword}". These should be phrases a user might search for when looking for information, solutions, or comparisons related to "${primaryKeyword}" within the "${category}" category. Examples: "how to improve ${primaryKeyword} for ${category}", "best ${primaryKeyword} alternatives", "common ${primaryKeyword} issues".`;
   } else { // semantic
-    instruction = `Generate ${count} unique semantic keywords or closely related concepts for the primary keyword "${primaryKeyword}" in the context of "${category}". These should be terms often discussed alongside "${primaryKeyword}". Examples: if primary keyword is "sugar cravings", semantic keywords could be "leptin resistance", "blood sugar balance", "emotional eating".`;
+    instruction = `Generate ${count} unique semantic keywords or closely related concepts for the primary keyword "${primaryKeyword}" in the context of "${category}". These should be terms often discussed alongside "${primaryKeyword}". Examples: if primary keyword is "weight loss", semantic keywords could be "metabolism", "calorie deficit", "mindful eating".`;
   }
 
   const prompt = `${instruction}

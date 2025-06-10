@@ -230,6 +230,27 @@ async function generateBlog(topic: BlogTopic): Promise<string | null> {
     // The text overlay is handled directly in the generateBlogImage function
     const imageUrl = await generateBlogImage(topic.title, topic.category, additionalContext);
     
+    if (!imageUrl) {
+      console.warn('No valid image generated (all contained text). Skipping image download and featuredImage for this blog.');
+      // Continue without setting featuredImage
+      // Save the blog JSON file (with full content)
+      const now = new Date();
+      const dateStr = `${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}-${now.getFullYear()}`;
+      const datedBlogDir = path.join(BLOG_DATA_DIR, dateStr);
+      if (!fs.existsSync(datedBlogDir)) {
+        fs.mkdirSync(datedBlogDir, { recursive: true });
+      }
+      const blogFilePath = path.join(datedBlogDir, `${topic.slug}.json`);
+      const relativeBlogFilePath = path.join(dateStr, `${topic.slug}.json`);
+      newBlogFile.filePath = relativeBlogFilePath;
+      newBlogIndex.filePath = relativeBlogFilePath;
+      fs.writeFileSync(blogFilePath, JSON.stringify(newBlogFile, null, 2));
+      console.log(`Created blog file (no image): ${blogFilePath}`);
+      (generateBlog as any).generatedBlogs = (generateBlog as any).generatedBlogs || [];
+      (generateBlog as any).generatedBlogs.push(newBlogIndex);
+      return topic.slug;
+    }
+    
     // Download the image - Ideogram images are temporary, so we need to download and save them
     console.log('Downloading image...');
     const response = await fetch(imageUrl);

@@ -10,8 +10,8 @@ import ReadingProgressBar from './ReadingProgressBar';
 import BlogCTA from './BlogCTA';
 // Import RelatedPosts component (will be created next)
 import RelatedPosts from './RelatedPosts';
-import { trackPageView } from '../../google-analytics';
-import mixpanel from 'mixpanel-browser'; // Import Mixpanel
+
+
 // Ensure the custom element and its stylesheet are loaded exactly once in the browser
 // if (typeof window !== 'undefined' && !customElements.get('lite-youtube')) {
 //   import('@justinribeiro/lite-youtube');
@@ -240,12 +240,7 @@ const BlogPostDetail = ({ slug }: BlogPostDetailProps) => {
       updateMetaTag('twitter:description', generateMetaDescription(post));
       updateMetaTag('twitter:url', canonicalUrl);
       updateMetaTag('twitter:image', imageUrl);
-      
-      // Track page view with updated title
-      trackPageView(
-        document.title,
-        window.location.pathname
-      );
+
     }
   }, [post]);
 
@@ -443,52 +438,13 @@ const BlogPostDetail = ({ slug }: BlogPostDetailProps) => {
   // Function to handle dismissing the bar
   const handleDismiss = () => {
     // Track dismissal in Mixpanel
-    const mixpanelApiKey = import.meta.env.VITE_MIXPANEL_API_KEY || '';
-    if (mixpanelApiKey) {
-      mixpanel.track('Web Button Tapped', {
-        'Button Name': 'Dismiss Sticky Bar',
-        'Screen Name': 'Blog Post',
-        'Post Slug': slug,
-        'Platform': 'Web',
-        'Interface': 'Web Blog'
-      });
-    }
+
     setIsBarDismissed(true);
   };
 
-  // Handle App Store link click
-  const handleAppStoreClick = () => {
-    // Track App Store click in Mixpanel
-    const mixpanelApiKey = import.meta.env.VITE_MIXPANEL_API_KEY || '';
-    if (mixpanelApiKey) {
-      mixpanel.track('Web App Store Redirect', {
-        'Button Name': 'App Store',
-        'Screen Name': 'Blog Post',
-        'Source': 'Sticky Bar',
-        'Post Slug': slug,
-        'Platform': 'Web',
-        'Interface': 'Web Blog',
-        'Destination': 'iOS App'
-      });
-    }
-  };
 
-  // Handle Google Play link click
-  const handlePlayStoreClick = () => {
-    // Track Google Play click in Mixpanel
-    const mixpanelApiKey = import.meta.env.VITE_MIXPANEL_API_KEY || '';
-    if (mixpanelApiKey) {
-      mixpanel.track('Web Play Store Redirect', {
-        'Button Name': 'Google Play',
-        'Screen Name': 'Blog Post',
-        'Source': 'Sticky Bar',
-        'Post Slug': slug,
-        'Platform': 'Web',
-        'Interface': 'Web Blog',
-        'Destination': 'Android App'
-      });
-    }
-  };
+
+
 
   return (
     <>
@@ -656,40 +612,7 @@ const BlogPostDetail = ({ slug }: BlogPostDetailProps) => {
               <span className="block text-sm">Stop your sugar cravings</span>
             </div>
 
-            {/* Buttons - Stacked on mobile, side by side on larger screens */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              {/* App Store Button */}
-              <a 
-                href="https://apps.apple.com/us/app/stoppr-sugar-cravings/id6504060227" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-full sm:w-auto"
-                onClick={handleAppStoreClick}
-              >
-                <img
-                  src="/images/svg/Download_on_the_App_Store_Badge.svg"
-                  alt="Download on the App Store"
-                  className="h-10 w-auto mx-auto hover:opacity-80 transition-opacity"
-                  width="120" height="40"
-                />
-              </a>
 
-              {/* Google Play Button */}
-              <a 
-                href="https://play.google.com/store/apps/details?id=com.stoppr.app" 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="w-full sm:w-auto"
-                onClick={handlePlayStoreClick}
-              >
-                <img
-                  src="/images/svg/Google_Play_Store_badge_EN.svg"
-                  alt="Get it on Google Play"
-                  className="h-10 w-auto mx-auto hover:opacity-80 transition-opacity"
-                  width="120" height="40"
-                />
-              </a>
-            </div>
           </motion.div>
         )}
         

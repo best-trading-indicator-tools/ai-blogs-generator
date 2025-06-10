@@ -4,7 +4,7 @@
  */
 
 import * as dotenv from 'dotenv';
-import { findRelevantYouTubeVideo, generateYoutubeEmbedCode } from './youtubeApi.js';
+import { findRelevantYouTubeVideo, generateYoutubeEmbedCode } from './youtubeApi';
 import * as fs from 'fs';
 import { promises as fsPromises } from 'fs'; // Import promises API
 import * as path from 'path';
@@ -17,7 +17,7 @@ const ANTHROPIC_API_KEY = process.env.VITE_ANTHROPIC_API_KEY;
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
 const KEYWORDS_DIR = path.join(process.cwd(), 'public', 'keywords');
-const LOOKSMAXXING_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'keywords.json');
+const NOSUGAR_KEYWORDS_PATH = path.join(KEYWORDS_DIR, 'nosugar_keywords.json');
 
 function loadJsonKeywords(filePath: string): string[] {
   try {
@@ -35,8 +35,8 @@ function loadJsonKeywords(filePath: string): string[] {
   return [];
 }
 
-// Global looksmaxxing keyword list (loaded once). If empty, generation will proceed but looksmaxxing detection may be limited.
-const looksmaxxingKeywords = loadJsonKeywords(LOOKSMAXXING_KEYWORDS_PATH);
+// Global nosugar keyword list (loaded once).
+const nosugarKeywords = loadJsonKeywords(NOSUGAR_KEYWORDS_PATH);
 
 /**
  * Gets valid blog post URLs from index.json only (no sitemap dependency).
@@ -167,15 +167,6 @@ export async function generateBlogContent(
     // Generate a random word count within the specified range
     const targetWordCount = Math.floor(Math.random() * (wordCountMax - wordCountMin + 1)) + wordCountMin;
     
-    // --- NEW: Detect Looksmaxxing Topic ---
-    const isLooksmaxxingTopic = looksmaxxingKeywords.some(keyword => 
-        title.toLowerCase().includes(keyword) || 
-        category.toLowerCase().includes(keyword) || 
-        (additionalContext && additionalContext.toLowerCase().includes(keyword))
-    );
-    console.log(`Is Looksmaxxing Topic: ${isLooksmaxxingTopic}`); // Log detection result
-    // --- END NEW ---
-
     // --- NEW: Get Internal Links --- Await the async call
     const allBlogUrls = await getBlogUrlsFromSitemap();
     const relevantLinks = selectRelevantInternalLinks(title, allBlogUrls, 3); // Get up to 3 relevant links
@@ -212,6 +203,7 @@ ${linkList}
       - Focus on providing valuable, science-backed information
       
       - **VARY PARAGRAPH LENGTH:** Use a mix of short (1-2 sentences), medium (3-4 sentences), and longer (5+ sentences) paragraphs throughout the article. This variation is crucial for readability and engagement. Avoid making all paragraphs the same length.
+      - CRITICAL: Avoid any paragraph longer than 5 sentences. If a section feels dense, break it up into smaller paragraphs or use subheadings/lists for readability. Never output a large block of text as a single paragraph.
       - **Sentence Structure:** While maintaining an authoritative tone, use a variety of sentence structures (simple, compound, complex) to create a natural rhythm. Avoid overly long and convoluted sentences where simpler ones would be clearer.
       
       TABLE REQUIREMENT:
@@ -254,6 +246,8 @@ ${linkList}
       
       STRUCTURE AND FORMAT:
       - Include at least one bulleted list (ul/li) and one numbered list (ol/li)
+      - CRITICAL: Use proper HTML list markup - ALL numbered lists MUST be formatted as <ol><li>Item 1</li><li>Item 2</li></ol> NOT as plain text "1. Item 1" "2. Item 2"
+      - CRITICAL: Use proper HTML list markup - ALL bulleted lists MUST be formatted as <ul><li>Item 1</li><li>Item 2</li></ul> NOT as plain text "- Item 1" "- Item 2"
       - Use proper HTML structure (no need for html, head, or body tags)
       - Write in a friendly, authoritative tone suitable for health and nutrition content
       - Do not include any introduction saying "here's an article about..."
@@ -265,65 +259,6 @@ ${linkList}
 
       Return ONLY the HTML content, nothing else.
     `;
-
-    if (isLooksmaxxingTopic) {
-      console.log("Using Looksmaxxing-specific prompts...");
-      system_persona = `You are a writer specializing in self-improvement, men's health, and lifestyle trends. You write engaging, balanced, and informative content about trending topics like looksmaxxing, drawing insights from online discussions (like TikTok, Reddit) while maintaining a critical and realistic perspective. You aim to educate readers about concepts, techniques, benefits, and potential risks without promoting harmful practices.`;
-
-      user_prompt_instructions = `
-        Write a detailed, engaging blog post titled "${title}" for the ${category} category.
-        ${additionalContext ? `Additional context: ${additionalContext}` : ''}
-        
-        IMPORTANT: The content MUST be between ${targetWordCount-20} and ${targetWordCount+20} words in length. 
-        This is a strict requirement - not less, not more.
-        
-        Topic Focus: Looksmaxxing & Related Trends
-        - The post should begin with a compelling introductory paragraph (without a heading) that hooks the reader, and then proceed into sections with appropriate <h2> and <h3> subheadings.
-        - Discuss the core concept of looksmaxxing and its goals.
-        - Mention specific techniques often discussed (e.g., mewing, grooming, style, fitness, facial aesthetics, posture). Use the specific terms from the title or context if applicable.
-        - Acknowledge its popularity on platforms like TikTok, Reddit, or YouTube.
-        - Provide a BALANCED perspective: discuss potential perceived benefits (e.g., confidence, self-care) AND potential risks/criticisms (e.g., unrealistic standards, body dysmorphia, misinformation, links to controversial online communities).
-        - Use a tone that is informative, balanced, and objective. Avoid overly sensational or judgmental language. Do not endorse questionable or harmful practices (like bone smashing).
-        - If discussing specific techniques, briefly explain them and touch upon any available evidence (or lack thereof) regarding their effectiveness or safety.
-
-        General Requirements:
-        - Write exactly ${targetWordCount} words (this is important and non-negotiable)
-        - Format as HTML with appropriate headings (h2, h3), paragraphs, and lists.
-        - **VARY PARAGRAPH LENGTH:** Use a mix of short (1-2 sentences), medium (3-4 sentences), and longer (5+ sentences) paragraphs.
-        - **Sentence Structure:** Use varied sentence structures for readability.
-        
-        TABLE REQUIREMENT:
-        - Include at least 1 informative HTML table comparing different aspects of looksmaxxing (e.g., common techniques vs. evidence, perceived benefits vs. risks, popular platforms discussing it).
-        - Ensure the table has a clear purpose, proper formatting (<table>, <tr>, <th>, <td>), 4+ rows, and 2-5 columns.
-        
-        IMAGE PLACEMENT REQUIREMENT:
-        - Include exactly 3 image placeholders: <div class="blog-image-placeholder" data-description="[detailed description]"></div>.
-        - Place them strategically (after first/second h2, middle, near end).
-        - Descriptions should be specific and relevant (e.g., "Collage showing diverse interpretations of men's style trends", "Diagram illustrating correct posture vs common posture issues", "Abstract image representing online discourse and trends"). Avoid overly literal or potentially problematic depictions.
-        
-        ENGAGEMENT & TONE:
-        - Start with an engaging hook relevant to self-improvement or online trends.
-        - Maintain a balanced, informative, and slightly critical/analytical tone throughout.
-        - End with a thoughtful conclusion summarizing the complexities of the topic and encouraging healthy self-perception.
-        
-        KEYWORD OPTIMIZATION:
-        - Naturally include "${title.toLowerCase()}" and related terms (looksmaxxing, mewing, grooming, style, etc.).
-        - Use variations in 2-3 H2/H3 headings.
-        - Write with search intent in mind (e.g., what is looksmaxxing, is mewing real, looksmaxxing risks).
-        - Maintain keyword density of approximately 1-2% naturally.
-        
-        STRUCTURE AND FORMAT:
-        - Include at least one bulleted list (ul/li) and one numbered list (ol/li).
-        - Use proper HTML structure (no need for html, head, or body tags).
-        - Avoid repetition and fluff
-        - Include clear explanations and specific examples where appropriate.
-        
-        ${internalLinksInstructions}
-
-        Return ONLY the HTML content, nothing else.
-      `;
-    }
-    // --- END NEW ---
 
     // --- NEW: Use defined prompts in API call ---
     console.log('Initiating Anthropic API call...'); // Log before fetch
@@ -423,64 +358,60 @@ ${linkList}
     // --- YouTube Video Integration Start ---
     const videoPlaceholder = "<!-- YOUTUBE_VIDEO_PLACEHOLDER -->";
 
-    // 1. Insert placeholder roughly in the middle
-    try {
+    // Find the first closing </table> tag
+    let tableEndIndex = generatedContent.indexOf('</table>');
+    if (tableEndIndex !== -1) {
+      // Insert after </table>
+      tableEndIndex += 8; // length of '</table>'
+      generatedContent = generatedContent.slice(0, tableEndIndex) + `\n\n${videoPlaceholder}\n\n` + generatedContent.slice(tableEndIndex);
+    } else {
+      // Fallback: Insert placeholder roughly in the middle as before
       const middleIndex = Math.floor(generatedContent.length / 2);
-      // Find the end of a paragraph tag after the middle point
       let insertIndex = generatedContent.indexOf('</p>', middleIndex);
       if (insertIndex === -1) {
-        // Fallback: if no </p> found after middle, try finding the *last* </p> before middle
         insertIndex = generatedContent.lastIndexOf('</p>', middleIndex);
       }
       if (insertIndex === -1) {
-        // Fallback 2: if still no </p>, insert right at the middle (less ideal)
-         console.warn("Could not find a suitable paragraph end tag for video insertion. Inserting at midpoint.");
-         insertIndex = middleIndex;
-         generatedContent = generatedContent.slice(0, insertIndex) + `\n${videoPlaceholder}\n` + generatedContent.slice(insertIndex);
+        console.warn("Could not find a suitable paragraph end tag for video insertion. Inserting at midpoint.");
+        insertIndex = middleIndex;
+        generatedContent = generatedContent.slice(0, insertIndex) + `\n${videoPlaceholder}\n` + generatedContent.slice(insertIndex);
       } else {
-         // Insert after the found </p> tag
-         insertIndex += 4; // length of '</p>'
-         generatedContent = generatedContent.slice(0, insertIndex) + `\n\n${videoPlaceholder}\n\n` + generatedContent.slice(insertIndex);
+        insertIndex += 4;
+        generatedContent = generatedContent.slice(0, insertIndex) + `\n\n${videoPlaceholder}\n\n` + generatedContent.slice(insertIndex);
       }
-
-
-      // 2. Generate Search Query
-      // Use the first ~1000 chars or the whole content if shorter
-      const contentSnippet = generatedContent.substring(0, 1000);
-      const searchQuery = await generateYouTubeSearchQuery(contentSnippet);
-
-      let videoFound = false;
-      if (searchQuery) {
-        // 3. Search YouTube
-        // Pass blog title for better validation
-        const videoId = await findRelevantYouTubeVideo(searchQuery, title);
-
-        if (videoId) {
-          // 4. Generate Embed Code
-          const embedCode = generateYoutubeEmbedCode(videoId);
-          // 5. Replace Placeholder with Embed Code
-          generatedContent = generatedContent.replace(videoPlaceholder, embedCode);
-          videoFound = true;
-          console.log(`Successfully embedded YouTube video ${videoId} for query "${searchQuery}"`);
-        } else {
-           console.log(`No YouTube video found for query "${searchQuery}".`);
-        }
-      } else {
-         console.log("Could not generate a YouTube search query.");
-      }
-
-      // 6. Remove placeholder if video wasn't found/embedded
-      if (!videoFound) {
-        generatedContent = generatedContent.replace(videoPlaceholder, '');
-        console.log("Removed YouTube video placeholder as no video was embedded.");
-      }
-
-    } catch (videoError) {
-        console.error("Error during YouTube video integration:", videoError);
-        // Ensure placeholder is removed if any error occurred during the video steps
-        generatedContent = generatedContent.replace(videoPlaceholder, '');
-        console.log("Removed YouTube video placeholder due to an error during integration.");
     }
+
+    // 2. Generate Search Query
+    // Use the first ~1000 chars or the whole content if shorter
+    const contentSnippet = generatedContent.substring(0, 1000);
+    const searchQuery = await generateYouTubeSearchQuery(contentSnippet);
+
+    let videoFound = false;
+    if (searchQuery) {
+      // 3. Search YouTube
+      // Pass blog title for better validation
+      const videoId = await findRelevantYouTubeVideo(searchQuery, title);
+
+      if (videoId) {
+        // 4. Generate Embed Code
+        const embedCode = generateYoutubeEmbedCode(videoId);
+        // 5. Replace Placeholder with Embed Code
+        generatedContent = generatedContent.replace(videoPlaceholder, embedCode);
+        videoFound = true;
+        console.log(`Successfully embedded YouTube video ${videoId} for query "${searchQuery}"`);
+      } else {
+         console.log(`No YouTube video found for query "${searchQuery}".`);
+      }
+    } else {
+       console.log("Could not generate a YouTube search query.");
+    }
+
+    // 6. Remove placeholder if video wasn't found/embedded
+    if (!videoFound) {
+      generatedContent = generatedContent.replace(videoPlaceholder, '');
+      console.log("Removed YouTube video placeholder as no video was embedded.");
+    }
+
     // --- YouTube Video Integration End ---
 
     return generatedContent;
